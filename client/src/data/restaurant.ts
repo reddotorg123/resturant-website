@@ -1,11 +1,11 @@
 export const restaurantConfig = {
-  name: "EMBER & STONE",
-  shortName: "E&S",
+  name: "WATERFALL",
+  shortName: "W",
   descriptor: "A study in fire, season, and the spaces between.",
-  address: "17 Mercer Street, Lower Manhattan",
-  phone: "+1 212 555 0184",
-  email: "hello@emberandstone.nyc",
-  hours: "Tue–Sat / 5:30 pm–11:00 pm",
+  address: "India",
+  phone: "Details coming soon",
+  email: "hello@waterfall.in",
+  hours: "Hours to be announced",
   heroImage:
     "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2200&q=88",
 };
