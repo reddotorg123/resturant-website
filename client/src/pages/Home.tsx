@@ -1,21 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Link, useLocation } from "wouter";
 import { ArrowDownRight, ArrowLeft, ArrowRight, Menu as MenuIcon, X } from "lucide-react";
-import { galleryData, dishes, menuData, restaurantConfig, storyChapters } from "@/data/restaurant";
+import { Link, useLocation } from "wouter";
+import { factoryConfig, flavors, galleryItems, processSteps, products } from "@/data/factory";
 
 type RevealProps = { children: ReactNode; className?: string; delay?: number };
-
 function Reveal({ children, className = "", delay = 0 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        node.classList.add("is-visible");
-        observer.unobserve(node);
-      }
-    }, { threshold: 0.12 });
+      if (entry.isIntersecting) { node.classList.add("is-visible"); observer.unobserve(node); }
+    }, { threshold: .12 });
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
@@ -23,181 +19,72 @@ function Reveal({ children, className = "", delay = 0 }: RevealProps) {
 }
 
 function Cursor() {
-  const dot = useRef<HTMLDivElement>(null);
-  const label = useRef<HTMLDivElement>(null);
+  const dot = useRef<HTMLDivElement>(null); const label = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const move = (event: MouseEvent) => {
-      if (dot.current) { dot.current.style.left = `${event.clientX}px`; dot.current.style.top = `${event.clientY}px`; }
-      if (label.current) { label.current.style.left = `${event.clientX}px`; label.current.style.top = `${event.clientY}px`; }
-    };
-    const setLabel = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const value = target.closest<HTMLElement>("[data-cursor]")?.dataset.cursor ?? "";
-      if (label.current) { label.current.textContent = value; label.current.style.opacity = value ? "1" : "0"; }
-    };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseover", setLabel);
-    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseover", setLabel); };
+    const move = (event: MouseEvent) => { if (dot.current) { dot.current.style.left = `${event.clientX}px`; dot.current.style.top = `${event.clientY}px`; } if (label.current) { label.current.style.left = `${event.clientX}px`; label.current.style.top = `${event.clientY}px`; } };
+    const labels = (event: MouseEvent) => { const value = (event.target as HTMLElement).closest<HTMLElement>("[data-cursor]")?.dataset.cursor ?? ""; if (label.current) { label.current.textContent = value; label.current.style.opacity = value ? "1" : "0"; } };
+    window.addEventListener("mousemove", move); window.addEventListener("mouseover", labels);
+    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseover", labels); };
   }, []);
-  return <><div ref={dot} className="cursor-dot" /><div ref={label} className="cursor-label" style={{ opacity: 0 }} /></>;
+  return <><div className="cursor-dot" ref={dot} /><div className="cursor-label" ref={label} style={{ opacity: 0 }} /></>;
 }
 
 function Nav() {
-  const [location] = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [open, setOpen] = useState(false);
-  const previousY = useRef(0);
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 28);
-      setHidden(y > previousY.current && y > 120);
-      previousY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  const links = [
-    ["Menu", "/menu"], ["About", "/about"], ["Experience", "/experience"], ["Gallery", "/gallery"], ["Reservations", "/reservations"], ["Location", "/location"],
-  ];
+  const [location] = useLocation(); const [scrolled, setScrolled] = useState(false); const [hidden, setHidden] = useState(false); const [open, setOpen] = useState(false); const previousY = useRef(0);
+  useEffect(() => { const handler = () => { const y = window.scrollY; setScrolled(y > 28); setHidden(y > previousY.current && y > 120); previousY.current = y; }; window.addEventListener("scroll", handler, { passive: true }); return () => window.removeEventListener("scroll", handler); }, []);
+  const links = [["Flavors", "/flavors"], ["Products", "/products"], ["Factory", "/factory"], ["About", "/about"], ["Quality", "/quality"], ["Gallery", "/gallery"]];
   return <>
-    <header className={`site-nav ${scrolled ? "scrolled" : ""} ${hidden ? "hidden-nav" : ""}`}>
-      <Link href="/" className="wordmark" aria-label="Waterfall home">W / F</Link>
-      <nav className="nav-links" aria-label="Primary navigation">
-        {links.map(([label, href]) => <Link key={href} href={href} aria-current={location === href ? "page" : undefined}>{label}</Link>)}
-      </nav>
-      <Link className="nav-cta" href="/reservations">Reserve <ArrowDownRight size={14} /></Link>
-      <button className="menu-toggle" onClick={() => setOpen(true)} aria-label="Open menu"><MenuIcon size={23} /></button>
-    </header>
-    {open && <div className="mobile-overlay">
-      <div className="mobile-top"><span className="wordmark">W / F</span><button className="menu-toggle" onClick={() => setOpen(false)} aria-label="Close menu"><X size={26} /></button></div>
-      <nav className="mobile-links">
-        {links.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{label}</Link>)}
-        <Link className="mobile-reserve" href="/reservations" onClick={() => setOpen(false)}>Reserve a table <ArrowDownRight size={20} /></Link>
-      </nav>
-      <div className="mobile-foot"><span>Waterfall</span><span>India</span></div>
-    </div>}
+    <header className={`site-nav ${scrolled ? "scrolled" : ""} ${hidden ? "hidden-nav" : ""}`}><Link href="/" className="wordmark" aria-label="Yuva Factory home">YUVA / F</Link><nav className="nav-links" aria-label="Primary navigation">{links.map(([label, href]) => <Link key={href} href={href} aria-current={location === href ? "page" : undefined}>{label}</Link>)}</nav><Link className="nav-cta" href="/contact">Contact <ArrowDownRight size={14} /></Link><button className="menu-toggle" onClick={() => setOpen(true)} aria-label="Open menu"><MenuIcon size={23} /></button></header>
+    {open && <div className="mobile-overlay"><div className="mobile-top"><span className="wordmark">YUVA / F</span><button className="menu-toggle" onClick={() => setOpen(false)} aria-label="Close menu"><X size={26} /></button></div><nav className="mobile-links">{links.map(([label, href]) => <Link href={href} key={href} onClick={() => setOpen(false)}>{label}</Link>)}<Link className="mobile-reserve" href="/contact" onClick={() => setOpen(false)}>Contact Yuva Factory <ArrowDownRight size={20} /></Link></nav><div className="mobile-foot"><span>Ice cream manufacturing</span><span>India</span></div></div>}
   </>;
 }
 
-function Marquee() {
-  return <div className="marquee-wrap"><div className="marquee">{Array.from({ length: 2 }).map((_, index) => <span key={index}>Season-led cooking <span>India</span> Open Tuesday — Saturday <span>Fire / Ferment / Gather</span></span>)}</div></div>;
-}
+function FrostBand() { return <div className="frost-band"><div className="frost-marquee">{Array.from({ length: 2 }).map((_, i) => <span key={i}>Cold crafted <span>India</span> Built for the next scoop <span>Milk / Fruit / Fire</span> Ice cream, made with purpose</span>)}</div></div>; }
 
 function Hero() {
-  return <section className="hero" id="top">
-    <div className="hero-media" style={{ backgroundImage: `url(${restaurantConfig.heroImage})` }} />
-    <div className="hero-content">
-      <div className="hero-kicker eyebrow">India · Season-led dining</div>
-      <h1 className="display hero-title">Enter<br /><em>the</em> evening.</h1>
-      <div className="hero-subrow">
-        <p className="hero-intro">An intimate room where fire leads, the season decides, and every plate leaves a little trace.</p>
-        <a className="scroll-cue" href="#arrival">Begin the descent</a>
-      </div>
-    </div>
-    <div className="hero-index eyebrow mono">01 / 07</div>
-  </section>;
+  return <section className="hero"><div className="hero-media" style={{ backgroundImage: `url(${factoryConfig.heroImage})` }} /><div className="hero-cold" /><div className="hero-content"><div className="hero-kicker eyebrow">India · Ice cream manufacturing</div><h1 className="display hero-title">Made<br /><em>to</em> move.</h1><div className="hero-subrow"><p className="hero-intro">A cinematic look inside the cold, bright world of YUVA FACTORY — where ingredients, machines, and imagination become the next scoop.</p><a className="scroll-cue" href="#inside">Enter the factory</a></div></div><div className="hero-index eyebrow mono">01 / 05</div></section>;
 }
 
-function HomePage() {
-  return <main>
-    <Hero />
-    <Marquee />
-    <section id="arrival" className="section section-dark arrival">
-      <Reveal className="arrival-visual"><img src="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1600&q=88" alt="Candlelit table at Waterfall" loading="lazy" /><div className="image-caption eyebrow"><span>Chapter 01</span><span>Arrival</span></div></Reveal>
-      <Reveal className="arrival-copy" delay={1}><div className="eyebrow" style={{ color: "var(--copper)" }}>The room</div><h2 className="display">Come in.<span>Discover.</span></h2><p className="section-copy">Past the street, the room gets quieter. A long table, low light, the scent of something just kissed by flame. We built Waterfall as a pause from the city — a place to linger between courses.</p><a className="link-arrow" href="#cuisine">Follow the light <ArrowRight size={15} /></a></Reveal>
-    </section>
-    <section id="cuisine" className="section section-cream">
-      <div className="ingredient-grid">
-        <Reveal className="ingredient-stack"><img src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?auto=format&fit=crop&w=900&q=88" alt="Fresh herbs and vegetables" loading="lazy" /><img src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=88" alt="Seasonal ingredients on a table" loading="lazy" /></Reveal>
-        <Reveal className="ingredient-copy" delay={1}><div className="eyebrow">Chapter 02 · The cuisine</div><h2 className="display">Crafted<span>with purpose.</span></h2><p className="section-copy">Our kitchen is guided by a simple conviction: the closer an ingredient stays to its source, the more it has to say. We coax, char, ferment and fold — then let the ingredient speak.</p><div className="ingredient-notes"><div className="ingredient-note"><strong>Fire</strong><span>Oak, ember, patience.</span></div><div className="ingredient-note"><strong>Season</strong><span>What the market gives us.</span></div><div className="ingredient-note"><strong>Balance</strong><span>Acid, smoke, texture.</span></div></div></Reveal>
-      </div>
-    </section>
-    <DishShowcase />
-    <section className="section section-dark plate-stage">
-      <Reveal className="plate-copy"><div className="eyebrow" style={{ color: "var(--copper)" }}>Chapter 03 · The dish</div><h2 className="display">The plate is<span>the story.</span></h2><p className="section-copy">A little theatre, grounded in something real. Turn the light across the room and let the surface change.</p><a className="link-arrow" href="/menu">Explore the menu <ArrowRight size={15} /></a></Reveal>
-      <Reveal className="plate-scene" delay={1}><div className="plate-shadow" /><div className="plate" aria-label="A ceramic plate with a composed dish" /><div className="steam" /><div className="steam two" /></Reveal>
-    </section>
-    <section className="section about-band">
-      <Reveal><div className="eyebrow">Chapter 04 · The story</div><h2 className="display">Behind<br /><span>the plate.</span></h2></Reveal>
-      <Reveal className="about-band-copy" delay={1}><p>“We’re not interested in making food louder. We’re interested in making the moment last longer.”</p><Link className="link-arrow" href="/about">Read our story <ArrowRight size={15} /></Link></Reveal>
-    </section>
-    <FinalCTA />
-  </main>;
+function PackageStage() {
+  return <section id="inside" className="section section-dark product-stage"><Reveal className="product-stage-copy"><div className="eyebrow" style={{ color: "var(--lime)" }}>Scene 01 · Product reveal</div><h2 className="display">Built for the<span>next scoop.</span></h2><p className="section-copy">We treat ice cream like a material. Folded, frozen, tested, and made ready for the moment the lid comes off.</p><Link className="lime-button" style={{ marginTop: 34 }} href="/products">Explore products <ArrowRight size={15} /></Link></Reveal><Reveal className="product-orbit" delay={1}><div className="cold-vapor" /><div className="orbit-ring" /><div className="package" data-cursor="ROTATE" aria-label="Yuva Factory vanilla package" /><div className="package-shadow" /></Reveal></section>;
 }
 
-function DishShowcase() {
-  return <section className="section section-dark dish-section">
-    <div className="dish-header"><div><div className="eyebrow" style={{ color: "var(--copper)" }}>Chapter 03 · Signature dishes</div><h2 className="display">From the fire.</h2></div><Link className="link-arrow" href="/menu">See the full menu <ArrowRight size={15} /></Link></div>
-    <div className="dish-track" aria-label="Signature dishes, scroll horizontally">
-      {dishes.map((dish) => <article className="dish-panel" key={dish.id} data-cursor="VIEW DISH"><img src={dish.image} alt={dish.name} loading="lazy" /><span className="dish-number eyebrow mono">DISH {dish.id}</span><div className="dish-meta"><div><h3 className="display dish-name">{dish.name}</h3><p className="dish-desc">{dish.subtitle}</p></div><span className="dish-price">{dish.price}</span></div></article>)}
-    </div>
-    <div className="track-hint eyebrow"><ArrowLeft size={14} /> Drag to explore <ArrowRight size={14} /></div>
-  </section>;
+function MacroSection() {
+  return <section className="section section-ice"><div className="macro-grid"><Reveal className="macro-stack"><img src={flavors[2].image} alt="Fresh strawberry texture" loading="lazy" /><img src={flavors[3].image} alt="Ripe mango ingredient" loading="lazy" /></Reveal><Reveal className="macro-copy" delay={1}><div className="eyebrow">Scene 02 · Ingredient laboratory</div><h2 className="display">Texture<span>is flavor.</span></h2><p className="section-copy">Bright fruit. Deep cocoa. The floral pull of vanilla. Every flavor starts as a close-up — a color, a scent, a little electricity.</p><div className="tech-notes"><div className="tech-note"><strong>Cold-set</strong><span>Slow texture, clean finish.</span></div><div className="tech-note"><strong>Real fruit</strong><span>Picked for character.</span></div><div className="tech-note"><strong>Low drama</strong><span>Nothing artificial in the feeling.</span></div></div></Reveal></div></section>;
 }
 
-function FinalCTA() {
-  return <section className="section section-copper" style={{ minHeight: "74vh", display: "grid", alignItems: "end" }}><Reveal><div className="eyebrow">The table is set</div><h2 className="display" style={{ maxWidth: 1000, margin: "22px 0 45px", fontSize: "clamp(4.4rem, 12vw, 12rem)", lineHeight: .76 }}>Come hungry.<br /><span style={{ color: "var(--paper)" }}>Leave inspired.</span></h2><Link className="link-arrow" href="/reservations">Reserve your table <ArrowDownRight size={15} /></Link></Reveal></section>;
+function FlavorSection() {
+  return <section className="section section-blue"><div className="flavor-header"><div><div className="eyebrow" style={{ color: "var(--lime)" }}>Scene 03 · Flavor experience</div><h2 className="display">Meet the moods.</h2></div><Link className="scroll-cue" href="/flavors">Open all flavors <ArrowRight size={15} /></Link></div><div className="flavor-rail">{flavors.map((flavor) => <Link href={`/flavors/${flavor.id}`} className="flavor-panel" key={flavor.id} data-cursor="EXPLORE"><img src={flavor.image} alt={`${flavor.name} ice cream`} loading="lazy" /><div className="flavor-meta"><div className="eyebrow"><span className="flavor-dot" style={{ background: flavor.color }} />Flavor 0{flavors.indexOf(flavor) + 1}</div><h3 className="display">{flavor.name}</h3><p>{flavor.detail}</p></div></Link>)}</div></section>;
 }
 
-function PageHero({ eyebrow, title, image }: { eyebrow: string; title: ReactNode; image: string }) {
-  return <section className="page-hero" style={{ backgroundImage: `linear-gradient(0deg, rgba(14,14,13,.98), rgba(14,14,13,.18)), url(${image})` }}><Reveal><div className="eyebrow" style={{ color: "var(--copper)" }}>{eyebrow}</div><h1 className="display">{title}</h1></Reveal></section>;
+function ProcessSection() {
+  return <section className="section section-dark"><div className="process-layout"><Reveal className="process-title"><div className="eyebrow" style={{ color: "var(--lime)" }}>Scene 04 · Manufacturing</div><h2 className="display">How we make<span>the cold.</span></h2><p className="section-copy">A real process, built around restraint. Twelve steps from ingredient selection to a product ready for distribution.</p></Reveal><div className="process-list">{processSteps.map((step, index) => <Reveal key={step.number} delay={index % 3}><article className="process-item"><div className="process-number eyebrow mono">{step.number}</div><div><h3 className="display">{step.name}</h3><p>{step.detail}</p></div><img src={step.image} alt={step.name} loading="lazy" /></article></Reveal>)}</div></div></section>;
 }
 
-function MenuPage() {
-  const [category, setCategory] = useState("Starters");
-  return <main><PageHero eyebrow="Chapter 06 · The menu" title={<>A menu in<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>motion.</em></>} image={dishes[2].image} /><section className="section section-cream page-content"><div className="section-intro"><div><div className="eyebrow">The current edit</div><p className="section-copy" style={{ marginTop: 24 }}>A loose collection of what is at its best right now. The menu changes with the market.</p></div><div><div className="menu-tabs" role="tablist">{Object.keys(menuData).map((item) => <button key={item} className={`menu-tab ${category === item ? "active" : ""}`} onClick={() => setCategory(item)} role="tab" aria-selected={category === item}>{item}</button>)}</div><div className="menu-list">{menuData[category].map((item) => <div className="menu-row" key={item.name}><h3>{item.name}</h3><p>{item.description}</p><span>{item.price}</span></div>)}</div></div></div></section><FinalCTA /></main>;
-}
+function AboutBand() { return <section className="section section-ice about-split"><Reveal><div className="eyebrow">Scene 05 · About Yuva Factory</div><h2 className="display">Young<br /><span>at heart.</span></h2><p className="section-copy" style={{ marginTop: 32 }}>We’re building an ice cream company for people who want more from the freezer aisle: better ingredients, clearer choices, and a little more possibility.</p><Link className="lime-button" style={{ marginTop: 34 }} href="/about">Our story <ArrowRight size={15} /></Link></Reveal><Reveal className="about-image" delay={1}><img src={factoryConfig.factoryImage} alt="Stainless steel machinery in a modern food factory" loading="lazy" /></Reveal></section>; }
 
-function AboutPage() {
-  return <main><PageHero eyebrow="Chapter 05 · The story" title={<>Good food.<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>A good room.</em></>} image={restaurantConfig.heroImage} /><section className="section section-dark"><div className="story-grid"><Reveal className="story-image"><img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&w=1400&q=88" alt="Warmly lit dining room" /></Reveal><div className="story-list">{storyChapters.map((chapter, index) => <Reveal key={chapter.number} delay={index % 3}><article className="story-item"><div className="eyebrow" style={{ color: "var(--copper)" }}>{chapter.number}</div><h3 className="display">{chapter.title}</h3><p>{chapter.body}</p></article></Reveal>)}</div></div></section><section className="section section-cream"><Reveal><div className="eyebrow">A note from the room</div><p className="display" style={{ maxWidth: 970, margin: "35px 0 0", fontSize: "clamp(3rem, 7vw, 7rem)", lineHeight: .86 }}>“The best evenings are the ones you don’t need to explain.”</p></Reveal></section><FinalCTA /></main>;
-}
+function FinalSection() { return <section className="section section-blue final"><div className="final-products" /><Reveal className="final-content"><div className="eyebrow" style={{ color: "var(--lime)" }}>Freeze frame</div><h2 className="display">Ice cream,<br /><span>made with purpose.</span></h2><Link className="lime-button" href="/products">Explore products <ArrowDownRight size={15} /></Link></Reveal></section>; }
 
-function GalleryPage() {
-  const [selected, setSelected] = useState<typeof galleryData[number] | null>(null);
-  useEffect(() => {
-    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setSelected(null); };
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
-  }, []);
-  return <main><PageHero eyebrow="Chapter 04 · The room" title={<>Seen in<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>fragments.</em></>} image={galleryData[0].image} /><section className="section section-dark page-content"><div className="gallery-grid">{galleryData.map((item, index) => <Reveal key={item.label} delay={index % 3}><figure className={`gallery-item ${item.size}`} data-cursor="OPEN" onClick={() => setSelected(item)}><img src={item.image} alt={item.label} loading="lazy" /><figcaption>{item.label}</figcaption></figure></Reveal>)}</div></section>{selected && <div className="lightbox" role="dialog" aria-modal="true" aria-label={selected.label} onClick={() => setSelected(null)}><button className="lightbox-close" onClick={() => setSelected(null)} aria-label="Close image"><X size={26} /></button><img src={selected.image} alt={selected.label} onClick={(event) => event.stopPropagation()} /></div>}<FinalCTA /></main>;
-}
+function PageHero({ eyebrow, title, image }: { eyebrow: string; title: ReactNode; image: string }) { return <section className="page-hero" style={{ backgroundImage: `url(${image})` }}><Reveal><div className="eyebrow" style={{ color: "var(--lime)" }}>{eyebrow}</div><h1 className="display">{title}</h1></Reveal></section>; }
 
-function ReservationPage() {
-  const [submitted, setSubmitted] = useState(false);
-  return <main><PageHero eyebrow="Chapter 07 · The reservation" title={<>Your table<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>awaits.</em></>} image={dishes[3].image} /><section className="section section-dark"><div className="form-layout"><Reveal><div className="eyebrow" style={{ color: "var(--copper)" }}>Join us</div><h2 className="display">Stay for<br /><span>the evening.</span></h2><p className="section-copy">We hold a few tables for walk-ins, but reservations are recommended. For groups of 7 or more, please email us directly.</p></Reveal><Reveal className="form" delay={1}>{submitted ? <div style={{ paddingTop: 40 }}><div className="eyebrow" style={{ color: "var(--copper)" }}>Confirmed</div><h3 className="display" style={{ fontSize: "clamp(3rem, 6vw, 6rem)", lineHeight: .84, margin: "24px 0" }}>Your table<br />is reserved.</h3><p className="section-copy">We look forward to welcoming you to Waterfall. A confirmation has been prepared for your inbox.</p><button className="form-submit" onClick={() => setSubmitted(false)}>Make another request <ArrowRight size={15} /></button></div> : <form onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}><div className="form-row"><div className="form-field"><label htmlFor="date">Date</label><input id="date" type="date" required /></div><div className="form-field"><label htmlFor="time">Time</label><select id="time" defaultValue="7:30 pm" required><option>6:00 pm</option><option>7:30 pm</option><option>9:00 pm</option></select></div></div><div className="form-row"><div className="form-field"><label htmlFor="guests">Guests</label><select id="guests" defaultValue="2 guests" required><option>2 guests</option><option>3 guests</option><option>4 guests</option><option>5+ guests</option></select></div><div className="form-field"><label htmlFor="name">Name</label><input id="name" type="text" placeholder="Your name" required /></div></div><div className="form-row"><div className="form-field"><label htmlFor="phone">Phone</label><input id="phone" type="tel" placeholder="+1" required /></div><div className="form-field"><label htmlFor="email">Email</label><input id="email" type="email" placeholder="you@example.com" required /></div></div><button className="form-submit" type="submit">Reserve table <ArrowDownRight size={15} /></button></form>}</Reveal></div></section></main>;
-}
+function ProductsPage() { const [category, setCategory] = useState("ALL"); const categories = ["ALL", "CUPS", "CONES", "TUBS", "STICKS"]; const shown = category === "ALL" ? products : products.filter((product) => product.category === category); return <main><PageHero eyebrow="Product showcase" title={<>The freezer<br /><em>aisle, re-cut.</em></>} image={products[2].image} /><section className="section section-dark page-content"><div className="menu-tabs" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{categories.map((item) => <button key={item} className={`menu-tab ${category === item ? "active" : ""}`} style={{ color: "var(--ice)", borderColor: "var(--line)" }} onClick={() => setCategory(item)}>{item}</button>)}</div><div className="product-grid">{shown.map((product, index) => <Reveal key={product.slug} delay={index % 3}><Link href={`/products/${product.slug}`} className="catalog-panel" data-cursor="EXPLORE"><img src={product.image} alt={product.name} loading="lazy" /><div className="catalog-meta"><div><div className="eyebrow" style={{ color: product.accent }}>YUVA / {product.category}</div><h3 className="display">{product.name}</h3><p>{product.description}</p></div><span className="catalog-pack">{product.pack}</span></div></Link></Reveal>)}</div></section><FinalSection /></main>; }
 
-function ExperiencePage() {
-  return <main><PageHero eyebrow="Chapter 04 · The experience" title={<>The room<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>moves slowly.</em></>} image={restaurantConfig.heroImage} /><section className="section section-cream"><div className="section-intro"><Reveal><div className="eyebrow">A dining room for the long way around</div></Reveal><Reveal delay={1}><p className="display" style={{ fontSize: "clamp(2.6rem, 5.5vw, 5.5rem)", lineHeight: .93, margin: 0 }}>A table is a stage, but the best moments happen between the lines.</p></Reveal></div></section><section className="section section-dark" style={{ paddingTop: 0 }}><Reveal><img src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=2200&q=88" alt="Dining room set for dinner" style={{ width: "100%", height: "70vh", objectFit: "cover", filter: "saturate(.72)" }} /></Reveal></section><FinalCTA /></main>;
-}
+function FlavorsPage() { return <main><PageHero eyebrow="Flavor laboratory" title={<>Follow the<br /><em>flavor.</em></>} image={flavors[2].image} /><section className="section section-ice page-content"><div className="section-intro"><Reveal><div className="eyebrow">A palette in motion</div><p className="section-copy" style={{ marginTop: 24 }}>From bright Alphonso mango to slow dark cocoa, each flavor is designed as a complete sensory world.</p></Reveal><Reveal delay={1}><div className="flavor-rail" style={{ paddingTop: 0, flexWrap: "wrap", overflow: "visible" }}>{flavors.map((flavor) => <Link href={`/flavors/${flavor.id}`} className="flavor-panel" style={{ flexBasis: "min(29vw, 360px)", minHeight: 470 }} key={flavor.id} data-cursor="EXPLORE"><img src={flavor.image} alt={flavor.name} /><div className="flavor-meta"><div className="eyebrow"><span className="flavor-dot" style={{ background: flavor.color }} />{flavor.id}</div><h3 className="display">{flavor.name}</h3><p>{flavor.detail}</p></div></Link>)}</div></Reveal></div></section><FinalSection /></main>; }
 
-function LocationPage() {
-  return <main><PageHero eyebrow="Come find us" title={<>Come<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>find us.</em></>} image={restaurantConfig.heroImage} /><section className="section section-dark"><div className="location-grid"><Reveal className="location-card"><div className="eyebrow" style={{ color: "var(--copper)" }}>Waterfall</div><h2 className="display">India<br />awaits.</h2><p className="section-copy">A room rooted in India, shaped by season, fire, and the people gathered around the table.</p><div className="location-meta"><div><div className="eyebrow">Hours</div><span>{restaurantConfig.hours}</span></div><div><div className="eyebrow">Contact</div><span>{restaurantConfig.phone}</span><span>{restaurantConfig.email}</span></div></div></Reveal><Reveal className="map-faux" delay={1}><div className="map-pin" /><div className="map-label">Waterfall</div></Reveal></div></section><FinalCTA /></main>;
-}
+function FactoryPage() { return <main><PageHero eyebrow="The factory" title={<>Behind<br /><em>the cold.</em></>} image={factoryConfig.factoryImage} /><section className="section section-dark"><div className="process-layout"><Reveal className="process-title"><div className="eyebrow" style={{ color: "var(--lime)" }}>A modern food facility</div><h2 className="display">Precision<br /><span>with feeling.</span></h2><p className="section-copy">Stainless steel, controlled temperatures, and people who know exactly when to leave a mixture alone.</p></Reveal><div className="process-list">{processSteps.map((step, index) => <Reveal key={step.number} delay={index % 3}><article className="process-item"><div className="process-number eyebrow mono">{step.number}</div><div><h3 className="display">{step.name}</h3><p>{step.detail}</p></div><img src={step.image} alt={step.name} loading="lazy" /></article></Reveal>)}</div></div></section><FinalSection /></main>; }
 
-function SmallPage({ kind }: { kind: "contact" | "events" | "private" }) {
-  const data = kind === "contact" ? { eyebrow: "Stay close", title: <>The line is<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>open.</em></>, image: dishes[4].image, body: "For group dining, press, collaborations, and everything in between, start a conversation with the room." } : kind === "events" ? { eyebrow: "A little more", title: <>After<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>hours.</em></>, image: restaurantConfig.heroImage, body: "Seasonal suppers, chef-led evenings, and the occasional reason to stay past last call. Join our list for what’s next." } : { eyebrow: "Private dining", title: <>Make a night<br /><em style={{ color: "var(--copper)", fontStyle: "normal" }}>of it.</em></>, image: dishes[0].image, body: "For celebrations, long tables, and private moments, tell us what you are imagining and our team will be in touch." };
-  return <main><PageHero eyebrow={data.eyebrow} title={data.title} image={data.image} /><section className="section section-cream"><div className="section-intro"><Reveal><div className="eyebrow">A note from Waterfall</div></Reveal><Reveal delay={1}><p className="display" style={{ fontSize: "clamp(2.7rem, 6vw, 6rem)", lineHeight: .88, margin: 0 }}>{data.body}</p><Link className="link-arrow" style={{ marginTop: 48 }} href={kind === "private" ? "/reservations" : "/location"}>{kind === "private" ? "Enquire now" : "Get in touch"} <ArrowRight size={15} /></Link></Reveal></div></section><FinalCTA /></main>;
-}
+function AboutPage() { return <main><PageHero eyebrow="About Yuva Factory" title={<>Make room<br /><em>for more.</em></>} image={factoryConfig.factoryImage} /><section className="section section-ice"><div className="story-grid"><Reveal className="story-image"><img src={factoryConfig.heroImage} alt="Ice cream product in a cold blue environment" /></Reveal><div className="story-list">{[{ n: "01", h: "Our story", p: "Yuva means young. Not an age — a way of looking at the world: curious, generous, and never finished." }, { n: "02", h: "Our values", p: "We make decisions in the open: ingredient first, process honest, and energy directed at what matters." }, { n: "03", h: "Our vision", p: "To make the freezer aisle feel like the start of something, not the end of a meal." }].map((item, index) => <Reveal key={item.n} delay={index % 3}><article className="story-item"><div className="eyebrow" style={{ color: "var(--cocoa)" }}>{item.n}</div><h3 className="display">{item.h}</h3><p>{item.p}</p></article></Reveal>)}</div></div></section><FinalSection /></main>; }
 
-function Footer() {
-  return <footer className="footer"><div className="footer-grid"><div><div className="eyebrow" style={{ color: "var(--copper)" }}>Waterfall</div><h2 className="display footer-title">Good food.<br />Good company.<br /><span style={{ color: "var(--copper)" }}>Good night.</span></h2></div><div className="footer-column"><div className="eyebrow">Explore</div><Link href="/menu">Menu</Link><Link href="/about">About</Link><Link href="/experience">Experience</Link><Link href="/gallery">Gallery</Link></div><div className="footer-column"><div className="eyebrow">Visit</div><Link href="/reservations">Reservations</Link><Link href="/location">Location</Link><Link href="/private-dining">Private dining</Link></div><div className="footer-column"><div className="eyebrow">Contact</div><span>{restaurantConfig.address}</span><span>{restaurantConfig.hours}</span><a href={`mailto:${restaurantConfig.email}`}>{restaurantConfig.email}</a></div></div><div className="footer-bottom"><span>© 2026 Waterfall</span><span>A study in fire, season, and the spaces between.</span></div></footer>;
-}
+function GalleryPage() { const [selected, setSelected] = useState<typeof galleryItems[number] | null>(null); useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setSelected(null); }; window.addEventListener("keydown", close); return () => window.removeEventListener("keydown", close); }, []); return <main><PageHero eyebrow="Gallery" title={<>Inside the<br /><em>world.</em></>} image={galleryItems[0].image} /><section className="section section-dark page-content"><div className="gallery-grid">{galleryItems.map((item, index) => <Reveal key={item.label} delay={index % 3}><figure className={`gallery-item ${item.size}`} data-cursor="VIEW" onClick={() => setSelected(item)}><img src={item.image} alt={item.label} loading="lazy" /><figcaption>{item.label}</figcaption></figure></Reveal>)}</div></section>{selected && <div className="lightbox" role="dialog" aria-modal="true" aria-label={selected.label} onClick={() => setSelected(null)}><button className="lightbox-close" onClick={() => setSelected(null)} aria-label="Close image"><X size={26} /></button><img src={selected.image} alt={selected.label} onClick={(event) => event.stopPropagation()} /></div>}<FinalSection /></main>; }
 
-export default function Site() {
-  const [location] = useLocation();
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); }, [location]);
-  let page: ReactNode = <HomePage />;
-  if (location === "/menu") page = <MenuPage />;
-  else if (location === "/about") page = <AboutPage />;
-  else if (location === "/gallery") page = <GalleryPage />;
-  else if (location === "/reservations") page = <ReservationPage />;
-  else if (location === "/experience") page = <ExperiencePage />;
-  else if (location === "/location") page = <LocationPage />;
-  else if (location === "/contact") page = <SmallPage kind="contact" />;
-  else if (location === "/events") page = <SmallPage kind="events" />;
-  else if (location === "/private-dining") page = <SmallPage kind="private" />;
-  return <div className="site-shell grain"><Nav /><Cursor />{page}<Footer /></div>;
-}
+function ContactPage() { const [submitted, setSubmitted] = useState(false); return <main><PageHero eyebrow="Contact Yuva Factory" title={<>Let’s make<br /><em>something cold.</em></>} image={factoryConfig.factoryImage} /><section className="section section-dark"><div className="form-layout"><Reveal><div className="eyebrow" style={{ color: "var(--lime)" }}>For distribution, wholesale, and business enquiries</div><h2 className="display">The line<br /><span>is open.</span></h2><p className="section-copy">Tell us what you are building. We’ll get back to you with the right flavor of answer.</p></Reveal><Reveal className="form" delay={1}>{submitted ? <div style={{ paddingTop: 40 }}><div className="eyebrow" style={{ color: "var(--lime)" }}>Message received</div><h3 className="display" style={{ fontSize: "clamp(3rem, 6vw, 6rem)", lineHeight: .84, margin: "24px 0" }}>We’ll be<br />in touch.</h3><button className="form-submit" onClick={() => setSubmitted(false)}>Send another <ArrowRight size={15} /></button></div> : <form onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}><div className="form-row"><div className="form-field"><label htmlFor="name">Name</label><input id="name" required placeholder="Your name" /></div><div className="form-field"><label htmlFor="email">Email</label><input id="email" type="email" required placeholder="you@company.com" /></div></div><div className="form-field"><label htmlFor="interest">I’m reaching out about</label><select id="interest" defaultValue="Distribution"><option>Distribution</option><option>Wholesale</option><option>Business enquiry</option><option>Something else</option></select></div><div className="form-field"><label htmlFor="message">Message</label><input id="message" required placeholder="Tell us a little more" /></div><button className="form-submit" type="submit">Send enquiry <ArrowDownRight size={15} /></button></form>}</Reveal></div></section><FinalSection /></main>; }
+
+function QualityPage() { return <main><PageHero eyebrow="Quality" title={<>Good inputs.<br /><em>Great texture.</em></>} image={flavors[4].image} /><section className="section section-ice"><div className="macro-grid"><Reveal className="macro-stack"><img src={flavors[0].image} alt="Vanilla ingredient" /><img src={flavors[1].image} alt="Chocolate ingredient" /></Reveal><Reveal className="macro-copy" delay={1}><div className="eyebrow">The Yuva standard</div><h2 className="display">Nothing<span>to hide.</span></h2><p className="section-copy">We care about what goes in, how it moves through the factory, and how it arrives with you. Ingredient quality, hygiene, and cold-chain discipline are part of the recipe.</p><div className="tech-notes"><div className="tech-note"><strong>Ingredient first</strong><span>Flavor starts at the source.</span></div><div className="tech-note"><strong>Food safe</strong><span>Clean rooms, clear standards.</span></div><div className="tech-note"><strong>Cold chain</strong><span>Cold from line to freezer.</span></div></div></Reveal></div></section><FinalSection /></main>; }
+
+function ProductDetail({ slug }: { slug: string }) { const product = products.find((item) => item.slug === slug) ?? products[0]; return <main><PageHero eyebrow={`Product / ${product.category}`} title={<>{product.name.split(" /")[0]}<br /><em>{product.name.split(" /")[1] ?? "ice cream"}.</em></>} image={product.image} /><section className="section section-dark product-stage"><Reveal className="product-stage-copy"><div className="eyebrow" style={{ color: product.accent }}>YUVA / {product.category}</div><h2 className="display">A closer<span>look.</span></h2><p className="section-copy">{product.description} A considered balance of texture, flavor, and finish.</p><p className="eyebrow" style={{ color: "var(--lime)", marginTop: 34 }}>{product.pack}</p><Link className="lime-button" style={{ marginTop: 34 }} href="/products">Back to products <ArrowLeft size={15} /></Link></Reveal><Reveal className="product-orbit" delay={1}><div className="cold-vapor" /><div className="orbit-ring" /><div className="package" style={{ background: `linear-gradient(103deg,#dce7e0 0 8%,${product.accent} 8% 17%,#071014 17% 75%,#caff3d 75% 81%,#dce7e0 81%)` }} /><div className="package-shadow" /></Reveal></section><FinalSection /></main>; }
+
+function Footer() { return <footer className="footer"><div className="footer-grid"><div><div className="eyebrow" style={{ color: "var(--lime)" }}>Yuva Factory</div><h2 className="display footer-title">Cold craft.<br />Bright flavor.<br /><span style={{ color: "var(--lime)" }}>Next energy.</span></h2></div><div className="footer-column"><div className="eyebrow">Explore</div><Link href="/flavors">Flavors</Link><Link href="/products">Products</Link><Link href="/factory">Factory</Link><Link href="/about">About</Link></div><div className="footer-column"><div className="eyebrow">Inside</div><Link href="/quality">Quality</Link><Link href="/gallery">Gallery</Link><Link href="/contact">Contact</Link></div><div className="footer-column"><div className="eyebrow">Connect</div><span>{factoryConfig.location}</span><span>{factoryConfig.phone}</span><a href={`mailto:${factoryConfig.email}`}>{factoryConfig.email}</a></div></div><div className="footer-bottom"><span>© 2026 YUVA FACTORY</span><span>Ice cream, made with purpose.</span></div></footer>; }
+
+function HomePage() { return <main><Hero /><FrostBand /><PackageStage /><MacroSection /><FlavorSection /><ProcessSection /><AboutBand /><FinalSection /></main>; }
+
+export default function Site() { const [location] = useLocation(); useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); }, [location]); let page: ReactNode = <HomePage />; if (location === "/flavors") page = <FlavorsPage />; else if (location === "/products") page = <ProductsPage />; else if (location.startsWith("/products/")) page = <ProductDetail slug={location.split("/")[2]} />; else if (location === "/factory") page = <FactoryPage />; else if (location === "/about") page = <AboutPage />; else if (location === "/quality") page = <QualityPage />; else if (location === "/gallery") page = <GalleryPage />; else if (location === "/contact") page = <ContactPage />; return <div className="site-shell grain"><Nav /><Cursor />{page}<Footer /></div>; }
