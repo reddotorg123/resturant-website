@@ -13,7 +13,7 @@ export const flavors = [
   { id: "chocolate", name: "Chocolate", detail: "Single-origin cocoa · dark fudge ripple", image: "/manus-storage/TvfyKZvEPJ9s_bff65bb9.jpg", color: "#8f5b45" },
   { id: "strawberry", name: "Strawberry", detail: "Sun-ripened fruit · fresh cream", image: "/manus-storage/cXnZZLQpjbk4_a161b864.jpg", color: "#f28d86" },
   { id: "mango", name: "Mango", detail: "Alphonso mango · bright citrus finish", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=1200&q=88", color: "#f6b646" },
-  { id: "pistachio", name: "Pista", detail: "Roasted pistachio · sea salt", image: "https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=1200&q=88", color: "#a5bd82" },
+  { id: "pistachio", name: "Pista", detail: "Roasted pistachio · sea salt", image: "https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=88", color: "#a5bd82" },
 ];
 
 export const products = [
