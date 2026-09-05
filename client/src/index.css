@@ -29,3 +29,5 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.reveal{opacity:1;transform:none}}
 
 .menu-tab{padding:11px 15px;border:1px solid rgba(238,245,240,.18);background:transparent;color:rgba(238,245,240,.72);font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transition:background .2s ease,color .2s ease,border-color .2s ease}.menu-tab:hover,.menu-tab.active{background:var(--lime);border-color:var(--lime);color:var(--night)}
+
+.brand-lockup{display:inline-flex;align-items:center;gap:10px;color:var(--ice);transition:color .2s ease}.brand-lockup:hover{color:var(--lime)}.brand-mark{width:31px;height:31px;overflow:visible}.brand-name{display:flex;flex-direction:column;line-height:.75}.brand-name strong{font-family:var(--sans);font-size:.86rem;letter-spacing:.16em}.brand-name i{margin-top:5px;color:var(--lime);font-size:.38rem;font-style:normal;font-weight:700;letter-spacing:.32em}.brand-lockup.compact .brand-mark{width:36px;height:36px}

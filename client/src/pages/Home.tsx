@@ -29,13 +29,23 @@ function Cursor() {
   return <><div className="cursor-dot" ref={dot} /><div className="cursor-label" ref={label} style={{ opacity: 0 }} /></>;
 }
 
+function BrandLogo({ compact = false }: { compact?: boolean }) {
+  return <Link href="/" className={`brand-lockup ${compact ? "compact" : ""}`} aria-label="Yuva Factory home">
+    <svg className="brand-mark" viewBox="0 0 42 42" aria-hidden="true">
+      <path d="M7 6c3 0 5 2 5 5v11c0 4 2 6 6 6s6-2 6-6V11c0-3 2-5 5-5h6v19c0 9-7 15-17 15S7 34 7 25V6Z" fill="none" stroke="currentColor" strokeWidth="2.4" />
+      <path d="M15 9v13M21 9v10M27 9v7" stroke="var(--lime)" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+    {!compact && <span className="brand-name"><strong>YUVA</strong><i>FACTORY</i></span>}
+  </Link>;
+}
+
 function Nav() {
   const [location] = useLocation(); const [scrolled, setScrolled] = useState(false); const [hidden, setHidden] = useState(false); const [open, setOpen] = useState(false); const previousY = useRef(0);
   useEffect(() => { const handler = () => { const y = window.scrollY; setScrolled(y > 28); setHidden(y > previousY.current && y > 120); previousY.current = y; }; window.addEventListener("scroll", handler, { passive: true }); return () => window.removeEventListener("scroll", handler); }, []);
   const links = [["Flavors", "/flavors"], ["Products", "/products"], ["Factory", "/factory"], ["About", "/about"], ["Quality", "/quality"], ["Gallery", "/gallery"]];
   return <>
-    <header className={`site-nav ${scrolled ? "scrolled" : ""} ${hidden ? "hidden-nav" : ""}`}><Link href="/" className="wordmark" aria-label="Yuva Factory home">YUVA / F</Link><nav className="nav-links" aria-label="Primary navigation">{links.map(([label, href]) => <Link key={href} href={href} aria-current={location === href ? "page" : undefined}>{label}</Link>)}</nav><Link className="nav-cta" href="/contact">Contact <ArrowDownRight size={14} /></Link><button className="menu-toggle" onClick={() => setOpen(true)} aria-label="Open menu"><MenuIcon size={23} /></button></header>
-    {open && <div className="mobile-overlay"><div className="mobile-top"><span className="wordmark">YUVA / F</span><button className="menu-toggle" onClick={() => setOpen(false)} aria-label="Close menu"><X size={26} /></button></div><nav className="mobile-links">{links.map(([label, href]) => <Link href={href} key={href} onClick={() => setOpen(false)}>{label}</Link>)}<Link className="mobile-reserve" href="/contact" onClick={() => setOpen(false)}>Contact Yuva Factory <ArrowDownRight size={20} /></Link></nav><div className="mobile-foot"><span>Ice cream manufacturing</span><span>India</span></div></div>}
+    <header className={`site-nav ${scrolled ? "scrolled" : ""} ${hidden ? "hidden-nav" : ""}`}><BrandLogo /><nav className="nav-links" aria-label="Primary navigation">{links.map(([label, href]) => <Link key={href} href={href} aria-current={location === href ? "page" : undefined}>{label}</Link>)}</nav><Link className="nav-cta" href="/contact">Contact <ArrowDownRight size={14} /></Link><button className="menu-toggle" onClick={() => setOpen(true)} aria-label="Open menu"><MenuIcon size={23} /></button></header>
+    {open && <div className="mobile-overlay"><div className="mobile-top"><BrandLogo compact /><button className="menu-toggle" onClick={() => setOpen(false)} aria-label="Close menu"><X size={26} /></button></div><nav className="mobile-links">{links.map(([label, href]) => <Link href={href} key={href} onClick={() => setOpen(false)}>{label}</Link>)}<Link className="mobile-reserve" href="/contact" onClick={() => setOpen(false)}>Contact Yuva Factory <ArrowDownRight size={20} /></Link></nav><div className="mobile-foot"><span>Ice cream manufacturing</span><span>India</span></div></div>}
   </>;
 }
 

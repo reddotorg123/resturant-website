@@ -9,9 +9,9 @@ export const factoryConfig = {
 };
 
 export const flavors = [
-  { id: "vanilla", name: "Vanilla", detail: "Madagascan vanilla · cold-set cream", image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=1200&q=88", color: "#f1e3bb" },
-  { id: "chocolate", name: "Chocolate", detail: "Single-origin cocoa · dark fudge ripple", image: "https://images.unsplash.com/photo-1567206563064-6f60f40a2b57?auto=format&fit=crop&w=1200&q=88", color: "#8f5b45" },
-  { id: "strawberry", name: "Strawberry", detail: "Sun-ripened fruit · fresh cream", image: "https://images.unsplash.com/photo-1498557850523-fd3d118b962e?auto=format&fit=crop&w=1200&q=88", color: "#f28d86" },
+  { id: "vanilla", name: "Vanilla", detail: "Madagascan vanilla · cold-set cream", image: "/manus-storage/z6T9YpDOV0gt_5df6ad1b.jpg", color: "#f1e3bb" },
+  { id: "chocolate", name: "Chocolate", detail: "Single-origin cocoa · dark fudge ripple", image: "/manus-storage/TvfyKZvEPJ9s_bff65bb9.jpg", color: "#8f5b45" },
+  { id: "strawberry", name: "Strawberry", detail: "Sun-ripened fruit · fresh cream", image: "/manus-storage/cXnZZLQpjbk4_a161b864.jpg", color: "#f28d86" },
   { id: "mango", name: "Mango", detail: "Alphonso mango · bright citrus finish", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=1200&q=88", color: "#f6b646" },
   { id: "pistachio", name: "Pista", detail: "Roasted pistachio · sea salt", image: "https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=1200&q=88", color: "#a5bd82" },
 ];
